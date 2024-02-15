@@ -19,6 +19,9 @@ class FileStorage:
     TestCases
     > Check types
     > Check contents
+    > file.json should be empty on first run
+    > Check text format in the storage classes
+    > Check for type after instaniation from storage file
     """
     __file_path = "file.json"
     __objects = dict()
@@ -53,8 +56,7 @@ class FileStorage:
                 obj_dict = json.load(f)
                 for k, v in obj_dict.items():
                     class_name = eval(v["__class__"])
-                    if k == "__class__":
-                        del v["__class__"]
+                    del v["__class__"]
                     FileStorage.__objects[k] = class_name(**v)
         except FileNotFoundError:
             pass
