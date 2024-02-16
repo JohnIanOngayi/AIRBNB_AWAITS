@@ -6,6 +6,12 @@ Module That Stores Data For The Whole Project in JSON Format
 
 import json
 from models.base_model import BaseModel
+from models.city import City
+from models.user import User
+from models.place import Place
+from models.state import State
+from models.review import Review
+from models.amenity import Amenity
 
 
 class FileStorage:
@@ -52,11 +58,10 @@ class FileStorage:
         Deserialises JSON file to __objects
         """
         try:
-            with open(FileStorage.__file_path) as f:
+            with open(FileStorage.__file_path, encoding="utf-8") as f:
                 obj_dict = json.load(f)
                 for k, v in obj_dict.items():
-                    class_name = eval(v["__class__"])
-                    del v["__class__"]
+                    class_name = eval(v.pop("__class__"))
                     FileStorage.__objects[k] = class_name(**v)
         except FileNotFoundError:
             pass

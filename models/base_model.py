@@ -71,7 +71,13 @@ class BaseModel:
         obj_dict = dict()
         obj_dict = self.__dict__
         obj_dict["__class__"] = self.__class__.__name__
-        obj_dict["created_at"] = self.created_at.isoformat()
+        if type(self.created_at) is not str:
+            obj_dict["created_at"] = self.created_at.isoformat()
+        else:
+            obj_dict["created_at"] = self.created_at
         obj_dict["id"] = self.id
-        obj_dict["updated_at"] = self.updated_at.isoformat()
+        if type(self.updated_at) is not str:
+            obj_dict["updated_at"] = self.updated_at.isoformat()
+        else:
+            obj_dict["updated_at"] = self.updated_at
         return obj_dict
