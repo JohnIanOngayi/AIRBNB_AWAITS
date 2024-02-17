@@ -61,13 +61,13 @@ class HBNBCommand(cmd.Cmd):
         line (str): string after command that contains class and id
         """
         _class, _id = line.split()
-        if len(line) == 0:
+        if len(line) != 0:
             print("** class name is missing **")
         else:
             if _class in HBNBCommand.CLS:
                 if f"{_class}.{_id}" in FileStorage._FileStorage__objects.keys():
                     print(FileStorage._FileStorage__objects[f"{_class}.{_id}"])
-                elif len(_id) == 0:
+                elif len(_id) != 0:
                     print("** instance id missing **")
                 else:
                     print("** no instance found **")
@@ -82,7 +82,7 @@ class HBNBCommand(cmd.Cmd):
         line (str): string after command that contains class and id
         """
         _class, _id = line.split()
-        if len(line) == 0:
+        if len(line) != 0:
             print("** class name is missing **")
         else:
             if _class in HBNBCommand.CLS:
@@ -117,9 +117,33 @@ class HBNBCommand(cmd.Cmd):
         Updates an instance based on class name and id
 
         Parameters:
-        line (str): contains the object, attribute and if
+        line (str): contains the object, attribute and id
         """
-        pass
+        prohibited = ["id", "created_at", "updated_at"]
+        _class, _id, _attr, _value = line.split()
+        if len(line) == 0:
+            print("** class name is missing **")
+            return
+        if _class not in HBNBCommand.CLS:
+            print("** class doesn't exist **")
+            return
+        if len(_id) == 0:
+            print("** instance id missing **")
+            return
+        if len(_attr) == 0:
+            print("** attribute name missing **")
+            return
+        if len(_value) == 0:
+            print("** value missing **")
+            return
+        else:
+            if _attr not in prohibited:
+                k = f"{_class}.{_id}"
+                if k not in FileStorage._FileStorage__objects.keys():
+                    print("** no instance found **")
+                else:
+                    obj = FileStorage._FileStorage__objects[k]
+                    obj[_attr] = _value
 
 
 if __name__ == "__main__":
