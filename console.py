@@ -13,6 +13,7 @@ from models.state import State
 from models.city import City
 from models.place import Place
 from models.review import Review
+import models
 
 
 class HBNBCommand(cmd.Cmd):
@@ -60,15 +61,15 @@ class HBNBCommand(cmd.Cmd):
         Parameters:
         line (str): string after command that contains class and id
         """
-        _class, _id = line.split()
-        if len(line) != 0:
+        argu = line.split()
+        if len(line) == 0:
             print("** class name is missing **")
         else:
-            if _class in HBNBCommand.CLS:
-                if f"{_class}.{_id}" in FileStorage._FileStorage__objects.keys():
-                    print(FileStorage._FileStorage__objects[f"{_class}.{_id}"])
-                elif len(_id) != 0:
+            if argu[0] in HBNBCommand.CLS:
+                if len(argu) < 2:
                     print("** instance id missing **")
+                elif f"{argu[0]}.{argu[1]}" in FileStorage._FileStorage__objects.keys():
+                    print(FileStorage._FileStorage__objects[f"{argu[0]}.{argu[1]}"])
                 else:
                     print("** no instance found **")
             else:
@@ -120,30 +121,33 @@ class HBNBCommand(cmd.Cmd):
         line (str): contains the object, attribute and id
         """
         prohibited = ["id", "created_at", "updated_at"]
-        _class, _id, _attr, _value = line.split()
         if len(line) == 0:
             print("** class name is missing **")
             return
-        if _class not in HBNBCommand.CLS:
+        args = line.split()
+        if len(args) >= 4:
+            key = "{}.{}".format(args[0], args[1])
+            cast = type(eval(args[3]))
+            arg3 = args[3]
+            arg3 = arg3.strip('"')
+            arg3 = arg3.strip("'")
+            if args[2] not in prohibited:
+                big_dict = FileStorage._FileStorage__objects
+                setattr(big_dict[key], args[2], cast(arg3))
+                storage.save()
+        elif len(args) == 0:
+            print("** class name missing **")
+        elif args[0] not in HBNBCommand.CLS:
             print("** class doesn't exist **")
-            return
-        if len(_id) == 0:
+        elif len(args) == 1:
             print("** instance id missing **")
-            return
-        if len(_attr) == 0:
+        elif ("{}.{}".format(args[0], args[1])) not in storage.all().keys():
+            print("** no instance found **")
+        elif len(args) == 2:
             print("** attribute name missing **")
-            return
-        if len(_value) == 0:
-            print("** value missing **")
-            return
         else:
-            if _attr not in prohibited:
-                k = f"{_class}.{_id}"
-                if k not in FileStorage._FileStorage__objects.keys():
-                    print("** no instance found **")
-                else:
-                    obj = FileStorage._FileStorage__objects[k]
-                    obj[_attr] = _value
+            print("** value missing **")
+
 
 
 if __name__ == "__main__":
