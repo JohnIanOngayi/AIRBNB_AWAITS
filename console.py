@@ -5,6 +5,7 @@ Module contains class HBNBCommand that runs the program's front end
 """
 
 import cmd
+import sys
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 from models.user import User
@@ -23,6 +24,14 @@ class HBNBCommand(cmd.Cmd):
 
     prompt = "(hbnb) "
     CLS = ["BaseModel", "User", "Amenity", "State", "City", "Place", "Review"]
+
+    def _precmd(self, line):
+        """
+        Parses a line before it is executed
+        """
+        if '.' in line:
+            _class, rest = line.split('.')
+            _command, argu = rest.split('(')
 
     def do_quit(self):
         """
@@ -68,12 +77,12 @@ class HBNBCommand(cmd.Cmd):
             if argu[0] in HBNBCommand.CLS:
                 if len(argu) < 2:
                     print("** instance id missing **")
-                elif f"{argu[0]}.{argu[1]}" in FileStorage._FileStorage__objects.keys():
-                    print(FileStorage._FileStorage__objects[f"{argu[0]}.{argu[1]}"])
+                elif f"{argu[0]}.{argu[1]}" in storage.all().keys():
+                    print(storage.all()[f"{argu[0]}.{argu[1]}"])
                 else:
                     print("** no instance found **")
             else:
-                print ("** class doesn't exist **")
+                print("** class doesn't exist **")
 
     def do_destroy(self, line):
         """
@@ -82,19 +91,19 @@ class HBNBCommand(cmd.Cmd):
         Parameters:
         line (str): string after command that contains class and id
         """
-        _class, _id = line.split()
-        if len(line) != 0:
+        argu = line.split()
+        if len(line) == 0:
             print("** class name is missing **")
         else:
-            if _class in HBNBCommand.CLS:
-                if f"{_class}.{_id}" in FileStorage._FileStorage__objects.keys():
-                    del FileStorage._FileStorage__objects[f"{_class}.{_id}"]
-                elif len(_id) == 0:
+            if argu[0] in HBNBCommand.CLS:
+                if len(argu) < 2:
                     print("** instance id missing **")
+                elif f"{argu[0]}.{argu[1]}" in storage.all().keys():
+                    del storage.all()[f"{argu[0]}.{argu[1]}"]
                 else:
                     print("** no instance found **")
             else:
-                print ("** class doesn't exist **")
+                print("** class doesn't exist **")
 
     def do_all(self, line):
         """
