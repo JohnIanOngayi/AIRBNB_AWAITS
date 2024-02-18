@@ -37,6 +37,8 @@ class HBNBCommand(cmd.Cmd):
                 _clas_meth, args = parts[0], '.'.join(parts[1:])
                 clas, meth = _clas_meth.strip(), args.split('(', 1)[0].strip()
                 args = args.split('(', 1)[1].rsplit(')', 1)[0].strip()
+                args = args.strip("'")
+                args = args.strip('"')
                 if clas not in HBNBCommand.CLS:
                     print("** class doesn't exist **")
                 else:
@@ -133,6 +135,23 @@ class HBNBCommand(cmd.Cmd):
                 if _class == line:
                     _all.append(v.__str__())
             print(f"{_all}")
+        else:
+            print("** class doesn't exist **")
+
+    def do_count(self, line):
+        """
+        Returns number of instances of said class 
+
+        Parameters:
+        line (str): string contaning class
+        """
+        count = 0
+        if line in HBNBCommand.CLS:
+            for k, v in storage.all().items():
+                _class, _id = k.split('.')
+                if _class == line:
+                    count = count + 1
+            print(count)
         else:
             print("** class doesn't exist **")
 
