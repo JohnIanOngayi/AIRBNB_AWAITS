@@ -14,7 +14,7 @@ from models.state import State
 from models.city import City
 from models.place import Place
 from models.review import Review
-import models
+from models import storage
 
 
 class HBNBCommand(cmd.Cmd):
@@ -25,13 +25,25 @@ class HBNBCommand(cmd.Cmd):
     prompt = "(hbnb) "
     CLS = ["BaseModel", "User", "Amenity", "State", "City", "Place", "Review"]
 
-    def _precmd(self, line):
+    def precmd(self, line):
         """
-        Parses a line before it is executed
+        Modify the input line before execution
         """
+        if not sys.stdin.isatty():
+            print()
         if '.' in line:
-            _class, rest = line.split('.')
-            _command, argu = rest.split('(')
+            parts = line.split('.')
+            if len(parts) >= 2:
+                _clas_meth, args = parts[0], '.'.join(parts[1:])
+                clas, meth = _clas_meth.strip(), args.split('(', 1)[0].strip()
+                args = args.split('(', 1)[1].rsplit(')', 1)[0].strip()
+                if clas not in HBNBCommand.CLS:
+                    print("** class doesn't exist **")
+                else:
+                    line = f"{meth} {clas} {args}"
+            else:
+                print("** Invalid syntax: Class or method missing **")
+        return cmd.Cmd.precmd(self, line)
 
     def do_quit(self):
         """
@@ -53,7 +65,7 @@ class HBNBCommand(cmd.Cmd):
         Parameters:
         line (str): string that comes after command 'create'
         """
-        if len(line) == 0:
+        if len(line) == 0 or line is None:
             print("** class name missing **")
         else:
             if line in HBNBCommand.CLS:
@@ -70,10 +82,11 @@ class HBNBCommand(cmd.Cmd):
         Parameters:
         line (str): string after command that contains class and id
         """
-        argu = line.split()
         if len(line) == 0:
             print("** class name is missing **")
+            return
         else:
+            argu = line.split()
             if argu[0] in HBNBCommand.CLS:
                 if len(argu) < 2:
                     print("** instance id missing **")
@@ -100,6 +113,7 @@ class HBNBCommand(cmd.Cmd):
                     print("** instance id missing **")
                 elif f"{argu[0]}.{argu[1]}" in storage.all().keys():
                     del storage.all()[f"{argu[0]}.{argu[1]}"]
+                    storage.save()
                 else:
                     print("** no instance found **")
             else:
@@ -114,7 +128,7 @@ class HBNBCommand(cmd.Cmd):
         """
         _all = list()
         if line in HBNBCommand.CLS:
-            for k, v in FileStorage._FileStorage__objects.items():
+            for k, v in storage.all().items():
                 _class, _id = k.split('.')
                 if _class == line:
                     _all.append(v.__str__())
@@ -141,7 +155,7 @@ class HBNBCommand(cmd.Cmd):
             arg3 = arg3.strip('"')
             arg3 = arg3.strip("'")
             if args[2] not in prohibited:
-                big_dict = FileStorage._FileStorage__objects
+                big_dict = storage.all()
                 setattr(big_dict[key], args[2], cast(arg3))
                 storage.save()
         elif len(args) == 0:
@@ -156,7 +170,6 @@ class HBNBCommand(cmd.Cmd):
             print("** attribute name missing **")
         else:
             print("** value missing **")
-
 
 
 if __name__ == "__main__":
