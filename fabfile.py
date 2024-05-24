@@ -1,15 +1,24 @@
 #!/usr/bin/python3
 
-from fabric.api import run, env, task
+from fabric.api import roles, run, env, task
 
-env.hosts = ['local-web-01', 'local-web-02']
+env.roledefs = {
+    'web-01': {
+        'hosts': ['local-web-01']
+    },
+    'web-02': {
+        'hosts': ['local-web-02']
+    }
+}
 
 
+@roles('web-01')
 @task
 def knowOs():
     run('uname -s')
 
 
+@roles('web-02')
 @task
 def knowHost():
     run('hostname')
