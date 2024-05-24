@@ -1,7 +1,7 @@
 #!/usr/bin/python3
 
 from fabric.api import cd, run, env, task
-from fabric.utils import abort
+from fabric.contrib.console import confirm
 
 env.hosts = ['local-web-01', 'local-web-02']
 
@@ -9,7 +9,9 @@ env.hosts = ['local-web-01', 'local-web-02']
 @task
 def seeNginx():
     with cd('/etc/nginx/sites-enabled/'):
-        run('cat default')
-        run('echo "before abort"')
-        abort('yeeeh budddddyyy!!!')
-        run('echo "after abort"')
+        confirm('Would you like to start: ', default=True)
+        run('echo "Command 1')
+        confirm('Would you like to proceed: ', default=True)
+        run('echo "Command 2')
+        confirm('Would you like to proceed: ', default=True)
+        run('echo "Command 3')
