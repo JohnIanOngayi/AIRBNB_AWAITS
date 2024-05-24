@@ -1,24 +1,11 @@
 #!/usr/bin/python3
 
-from fabric.api import roles, run, env, task
+from fabric.api import cd, run, env, task
 
-env.roledefs = {
-    'web-01': {
-        'hosts': ['local-web-01']
-    },
-    'web-02': {
-        'hosts': ['local-web-02']
-    }
-}
+env.hosts = ['local-web-01', 'local-web-02']
 
 
-@roles('web-01')
 @task
-def knowOs():
-    run('uname -s')
-
-
-@roles('web-02')
-@task
-def knowHost():
-    run('hostname')
+def seeNginx():
+    with cd('/etc/nginx/sites-enabled/'):
+        run('cat default')
