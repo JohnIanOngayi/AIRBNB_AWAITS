@@ -38,10 +38,24 @@ class TestBaseModel(unittest.TestCase):
         """
         Test the class string method
         """
-        self.assertEqual(self.A.__str__,
+        self.assertEqual(self.A.__str__(),
                          f"[BaseModel] ({self.A.id}) {self.A.__dict__}")
-        self.assertEqual(self.B.__str__,
+        self.assertEqual(self.B.__str__(),
                          f"[BaseModel] ({self.B.id}) {self.B.__dict__}")
+
+    def test_dict(self):
+        """
+        Tests the class to_dict method
+        """
+        model = BaseModel()
+        model_dict = model.to_dict()
+        self.assertIsInstance(model_dict, dict)
+        self.assertEqual(model_dict['__class__'], model.__class__.__name__)
+        self.assertEqual(model_dict['id'], model.id)
+        self.assertEqual(model_dict['created_at'],
+                         model.created_at.isoformat())
+        self.assertEqual(model_dict['updated_at'],
+                         model.updated_at.isoformat())
 
 
 if __name__ == "__main__":
